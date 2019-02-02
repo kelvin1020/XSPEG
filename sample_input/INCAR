@@ -1,0 +1,20 @@
+#parameter input format 
+#first 16 characters: variable name
+#after 17th character: value, in python style
+
+#MASS should be in unit of solar mass
+MASS            1e6
+MASS_RATIO      1e-5
+#SPIN, ECC, P should be in geometrized unit
+SPIN            0.8
+ECC             0.2
+P               8
+IOTA            numpy.pi/4
+METRIC          'Kerr'
+#time should be in unit of second
+TOTAL_TIME      1e6
+
+#observation setting
+THETA           numpy.pi/4
+PHI             0
+R_PC            5e9

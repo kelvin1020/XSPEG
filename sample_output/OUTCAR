@@ -1,0 +1,27 @@
+------------------------------------------
+Reading INCAR file...
+INCAR file read.
+
+Configuration shown below:
+ECC             2.0000000000e-01
+P               8.0000000000e+00
+IOTA            7.8539816340e-01
+SPIN            8.0000000000e-01
+MASS            1.0000000000e+06
+THETA           7.8539816340e-01
+PHI             0.0000000000e+00
+MASS_RATIO      1.0000000000e-05
+R_PC            5.0000000000e+09
+METRIC          KERR
+
+
+------------------------------------------
+Orbit calculation start...
+Orbit Calculation done. Orbits saved in ORBCAR
+------------------------------------------
+
+
+------------------------------------------
+Waveform calculation start...
+Waveform calculation done. Waveform saved in WAVECAR
+------------------------------------------
