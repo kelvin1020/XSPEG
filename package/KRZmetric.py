@@ -565,8 +565,8 @@ def getwave(filename,THETA=np.pi/4,PHI=0,M=1e6,R_pc=5e9,mu=1e-5,usenp=True):
     #小天体的质量
     #mu=1e-5 #应该是以中心天体质量为单位的
 
-    hTT_plus_true=np.array(hTT_plus)*mu/R*M
-    hTT_cross_true=np.array(hTT_cross)*mu/R*M
+    hTT_plus_true=np.array(hTT_plus)*mu/R
+    hTT_cross_true=np.array(hTT_cross)*mu/R
 
     ########用于计算的波形，plus作为实部，cross作为虚部
 
@@ -609,8 +609,8 @@ def bracket(mydata,mytemp,dt,fnoise=[-1,-1],Snoise=[-1,-1]):
             Sn=noisefit(freq[0:int(freq.size/2)])#如果输入的范围不够在这行会报错
             
         except:#如果报错说明输入的功率谱范围覆盖不了信号傅里叶变换后的功率谱，那么把输入功率谱的左右两侧用直线外推
-            leftfit=np.poly1d(np.polyfit(fnoise[0:int(freq.size/8)],Snoise[0:int(freq.size/8)],1))
-            rightfit=np.poly1d(np.polyfit(fnoise[int(freq.size/2)-int(freq.size/8):int(freq.size/2)],Snoise[int(freq.size/2)-int(freq.size/8):int(freq.size/2)],1))
+            leftfit=np.poly1d(np.polyfit(fnoise[0:int(fnoise.size/8)],Snoise[0:int(fnoise.size/8)],1))
+            rightfit=np.poly1d(np.polyfit(fnoise[int(fnoise.size)-int(fnoise.size/8):int(fnoise.size)],Snoise[int(fnoise.size)-int(fnoise.size/8):int(fnoise.size)],1))
             Sn=[]
             for i in np.arange(int(freq.size/2)):
                 if freq[i]<fnoise[0]:
@@ -771,6 +771,7 @@ def Dphi_int(chi,spin,e,p):
     return Dp_
 
 def getfreq_dt_fromepa(e,p,spin):
+    #reference: PHYSICAL REVIEW D 66, 044002 (2002)
     myTr,err=scipy.integrate.quad(Tr_int,0,np.pi,args=(spin,e,p))
     myDphi,err=scipy.integrate.quad(Dphi_int,0,np.pi,args=(spin,e,p))
     omg_rdt=2*np.pi/myTr
@@ -863,8 +864,9 @@ def circfreq_sec_fromtrace(t,phi,M):
     omgsec=omg*clight**3/M/Msol/Grav
     return omgsec
 
-########### below: 3D frequency & subroutines
+###########--------- below: 3D frequency & subroutines
 def Vr_freq3sub(E,L,e,p,iota,spin):
+    #ref: eq.(30) in PHYSICAL REVIEW D 96, 044005 (2017)
     #Vr at apestron and periastron, assuming Vth(theta_min)=0, i.e.Q=cos(theta)*(a**2*(1-E**2)+L**2/(sin(theta)*sin(theta)));
     a=spin
     ra=p/(1-e);
@@ -965,18 +967,36 @@ def freq3_sec(e,p,iota,spin,M):
     #把频率换成s^-1
     omgsec=np.array(omg)*clight**3/M/Msol/Grav
     return omgsec
-######### above: 3D frequency & subroutines
+#########---------------- above: 3D frequency & subroutines
+def RRprime_circ(E,Lz,r,th,a): #anxillary function for getting ELQ for circular orbits
+    Delta = r**2 - 2 *r + a**2
+    Q = np.cos(th)**2 *(a**2 * (1 - E**2) + Lz**2 /np.sin(th)**2 ) #令Vth=0
+    R = (E*(r**2 + a**2) - a*Lz)**2 - Delta*(r**2 + (Lz - a*E)**2 + Q) 
+    Rprime= (-(-2 + 2*r))*(((-a)*E + Lz)**2 + Q + r**2) - 2*r*(a**2 - 2*r + r**2) + 4*E*r*((-a)*Lz + E*(a**2 + r**2))
+    return R,Rprime
+
 def getELQ(e,p,iota,spin):
-    def myfunc(x):
-        E=x[0]
-        L=x[1]
-        V= Vr_freq3sub(E,L,e,p,iota,spin)
-        #print('E:%f, L:%f, V: %f, %f'%(E,L,V[0],V[1]))
-        return V
-    E,Lz=fsolve(myfunc,[0.9,3.0])
-    th_min=np.pi/2-iota
-    Q=np.cos(th_min)**2*(spin**2*(1-E**2)+Lz**2/(np.sin(th_min)*np.sin(th_min)))
-    return E,Lz,Q
+    if(e<1e-5):#circular orbits
+        r=p
+        th=np.pi/2-iota
+        def myfunc(x):
+            E=x[0]
+            Lz=x[1]
+            return RRprime_circ(E,Lz,r,th,spin)
+        output=fsolve(myfunc,[0.9,3.0],full_output=True,xtol=1e-20)
+        E=output[0][0];Lz=output[0][1]
+        Q = np.cos(th)**2 *(spin**2 * (1 - E**2) + Lz**2 /np.sin(th)**2 )
+    else:
+        def myfunc(x):
+            E=x[0]
+            L=x[1]
+            V= Vr_freq3sub(E,L,e,p,iota,spin)
+            #print('E:%f, L:%f, V: %f, %f'%(E,L,V[0],V[1]))
+            return V
+        E,Lz=fsolve(myfunc,[0.9,3.0])
+        th_min=np.pi/2-iota
+        Q=np.cos(th_min)**2*(spin**2*(1-E**2)+Lz**2/(np.sin(th_min)*np.sin(th_min)))
+    return np.array([E,Lz,Q])
 
 def freq3_dt_fromtrace(t,r,th,phi):
     #由序列获得orbital frequency(对t的),这个序列必须是从r最大值开始的

@@ -57,7 +57,7 @@ R_pc=float(control.r_pc)
 
 if control.metric.lower() != 'kerr':
     defpar_val=np.array(control.defpar_val)
-    if control.metric.lower == 'krz':
+    if control.metric.lower() == 'krz' or control.metric.lower() == 'custom':
         d1=defpar_val[0]
         d2=defpar_val[1]
         d3=defpar_val[2]
@@ -72,8 +72,13 @@ outcarfile.write("PHI".ljust(16) +'%.10e'%PHI + '\n')
 outcarfile.write("MASS_RATIO".ljust(16) +'%.10e'%mass_ratio + '\n')
 outcarfile.write("R_PC".ljust(16) +'%.10e'%R_pc + '\n')
 outcarfile.write("METRIC".ljust(16) + control.metric.upper() + '\n')
+
 if control.metric.lower() != 'kerr':
-    outcarfile.write("DEFPAR_VAL".ljust(16)+ defpar_val + '\n')
+    valstr='[ '
+    for i in range(len(defpar_val)):
+        valstr=valstr+'%.10e,'%(defpar_val[i])
+    valstr=valstr+' ]'
+    outcarfile.write("DEFPAR_VAL".ljust(16)+ valstr + '\n')
 
 #orbit calculation
 E,Lz,Q=getELQ(e,p,iota,spin)
@@ -81,12 +86,34 @@ outcarfile.write('\n\n')
 outcarfile.write('------------------------------------------\n')
 outcarfile.write('Orbit calculation start...\n')
 #outcarfile.write('------------------------------------------\n')
+print("METRIC: "+control.metric.lower())
 
-os.system('cp '+XSPEGdir+'/trace '+curdir  )
-os.system('echo ./trace %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e \n'%(M,spin,E,Lz,Q,p/(1-e),tottime,d1,d2,d3))
+if control.metric.lower() == 'krz'or control.metric.lower() == 'kerr':
+    #print("METRIC: "+control.metric.upper)
+    os.system('cp '+XSPEGdir+'/trace '+curdir  )
+elif control.metric.lower() == 'custom':
+    os.system('cp '+ XSPEGdir+'/custom/main.cpp ' + curdir)
+    os.system('cp '+ XSPEGdir+'/custom/def.h ' + curdir)
+    os.system('cp '+ XSPEGdir+'/custom/christoffel.cpp ' + curdir)
+    #os.system('echo cp')
+    #os.system('echo cp '+ XSPEGdir+'/custom/main.cpp ' + curdir)
+    #os.system('echo cp '+ XSPEGdir+'/custom/def.h ' + curdir)
+    #os.system('echo cp '+ XSPEGdir+'/custom/christoffel.cpp ' + curdir)
 
-os.system('./trace %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e \n'%(M,spin,E,Lz,Q,p/(1-e),tottime,d1,d2,d3))
+    try:
+        os.system('g++ '+curdir+'/*.cpp '+curdir+'/*.h -o trace')
+        #os.system('echo g++ '+curdir+'/*.cpp '+curdir+'/*.h -o trace')
+
+    except:
+        print('Please check custom metric files you prepared')
+os.system('echo ./trace %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e\n'%(M,spin,E,Lz,Q,p/(1-e),tottime,d1,d2,d3,mass_ratio,e,p,iota))
+
+os.system('./trace %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e\n'%(M,spin,E,Lz,Q,p/(1-e),tottime,d1,d2,d3,mass_ratio,e,p,iota))
 os.system('rm trace')
+if control.metric.lower() == 'custom':
+    os.system('rm main.cpp')
+    os.system('rm christoffel.cpp')
+    os.system('rm def.h')
 
 print('Orbit saved in '+curdir+'/ORBCAR')
 #outcarfile.write('------------------------------------------\n')

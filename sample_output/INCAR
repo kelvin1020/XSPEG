@@ -4,15 +4,15 @@
 
 #MASS should be in unit of solar mass
 MASS            1e6
-MASS_RATIO      1e-5
+MASS_RATIO      1e-2
 #SPIN, ECC, P should be in geometrized unit
-SPIN            0.8
-ECC             0.2
-P               8
+SPIN            0.9
+ECC             0.0
+P               10
 IOTA            numpy.pi/4
 METRIC          'Kerr'
 #time should be in unit of second
-TOTAL_TIME      1e3
+TOTAL_TIME      1e4
 
 #observation setting
 THETA           numpy.pi/4
