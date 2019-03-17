@@ -8,6 +8,8 @@ mkdir ~/local
 mkdir ~/local/xspeg
 cp -r ./package/* ~/local/xspeg
 
+chmod +x ~/local/xspeg/xspeg
+
 echo '#added by XSPEG'>>~/.bash_profile
 echo 'export PATH=$PATH:~/bin/'>>~/.bash_profile
 echo 'export XSPEGLIB=~/local/xspeg'>>~/.bash_profile

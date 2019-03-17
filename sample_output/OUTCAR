@@ -19,9 +19,5 @@ METRIC          KERR
 Orbit calculation start...
 Orbit Calculation done. Orbits saved in ORBCAR
 ------------------------------------------
-
-
-------------------------------------------
-Waveform calculation start...
 Waveform calculation done. Waveform saved in WAVECAR
 ------------------------------------------

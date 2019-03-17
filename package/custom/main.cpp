@@ -29,6 +29,7 @@ void Gamma_car(double spin, double defpar[], double car[], double Gamma[][4][4])
 void get_current_orbitpar(double tlist[], double rlist[], double thlist[], double philist[], double orbitpar[]);
 int time_long_enough(double rlist[], double thlist[]);
 void get_flux(double spin,double E, double L, double Q, double flux[]);
+void getwave(double M, double R_pc, double mu/*mass ratio*/, double THETA, double PHI, double r, double th, double phi, double ut, double ur, double uth, double uphi, double F_t, double F_r, double F_th, double F_phi, double wave[2]);
 
 int main(int argc, char *argv[])
 {//RK45的参数
@@ -85,6 +86,13 @@ int main(int argc, char *argv[])
 	double ita,mu=-1;//计算过程中四速度的模是\ita， 描述粒子性质的是mu 有质量：mu=-1，无质量： mu=0
 
 //input argument: 1. M, 2. spin, 3. E, 4. Lz, 5. Q, 6. r0, 7. tottime, 8-10. defpar, 11. mass ratio
+
+	
+	//Observation setting
+	double R_pc = atof(argv[15]);
+	double THETA = atof(argv[16]);
+	double PHI = atof(argv[17]);
+	printf("Observing from %.10e pc, at THETA= %.2f degree, PHI= %.2f degree.\n",R_pc,THETA/Pi*180,PHI/Pi*180);		
 	
 	/***************************改成秒间隔需要改的部分********************/
 
@@ -362,6 +370,9 @@ int main(int argc, char *argv[])
 
 					sprintf(filename_o,"ORBCAR");// "trace_M%.0f_spin%.6f_E%.6f_Lz%.6f_Q%.6f_d1%.6f_d2%.6f_d3%.6f.dat", M, spin, E, Lz, Q, defpar[1], defpar[2], defpar[3]);
 					foutput = fopen(filename_o, "w");
+					FILE *foutputwave;
+					sprintf(filename_o, "WAVECAR");
+					foutputwave = fopen(filename_o, "w");
 					/*
 					FILE *foutputnk;
 					sprintf(filename_o, "NK_M%.0f_spin%.6f_E%.6f_Lz%.6f_Q%.6f_d1%.6f_d2%.6f_d3%.6f.dat", M, spin, E, Lz, Q, defpar[1], defpar[2], defpar[3]);
@@ -386,6 +397,7 @@ int main(int argc, char *argv[])
 					double err, maxerr=1e-10, minerr=1e-11;//计算过程中的误差，容许的最大误差，容许的最小误差
 					int check=0;//标记有没有超过最大误差或小于最小误差
 					int index = 0;
+					double wave[2] = { 0,0 };//wave[0]=h_plus, wave[1]=h_cross
 					h = dtau;
 					tau = 0;
 					double * tlist, *rlist, *thlist, *philist;
@@ -408,7 +420,7 @@ int main(int argc, char *argv[])
                                                         printf("\033[1A"); // move cursor one line up
                                                         printf("\033[K");   // delete till end of line
 
-                                                        printf("Time t/M=%f. Current semilatus p=%f eccentricity e=%f inclination iota=%f \n", var[0]+var[8],current_p,current_e,current_iota);
+                                                       printf("Time t/M=%f. Current semilatus p=%f eccentricity e=%f inclination iota=%f \n", var[0]+var[8],current_p,current_e,current_iota);
                                                 //}
 
 //						printf("p=%f\n", current_p);
@@ -565,6 +577,15 @@ int main(int argc, char *argv[])
 							//fprintf(foutputnk, "%.10e %.10e %.10e %.10e %.10e %.10e %.10e\n",
 							//	var[0]+var[8], var[1] + var[9], var[2] + var[10], var[3] + var[11], E, Lz, Q);
 							fflush(foutput);
+							getwave(M, R_pc, massratio, THETA, PHI, var[1] + var[9], var[2] + var[10], var[3] + var[11], var[4] + var[12], var[5] + var[13], var[6] + var[14], var[7] + var[15],
+								/*F_t*/(z1*k1[4] + z2*k2[4] + z3*k3[4] + z4*k4[4] + z5*k5[4] + z6*k6[4]) / h,
+								/*F_r*/(z1*k1[5] + z2*k2[5] + z3*k3[5] + z4*k4[5] + z5*k5[5] + z6*k6[5]) / h,
+								/*F_theta*/(z1*k1[6] + z2*k2[6] + z3*k3[6] + z4*k4[6] + z5*k5[6] + z6*k6[6]) / h,
+								/*F_phi*/(z1*k1[7] + z2*k2[7] + z3*k3[7] + z4*k4[7] + z5*k5[7] + z6*k6[7]) / h, wave);
+							fprintf(foutputwave, "%.10e %.10e %.10e\n",
+								t_sec, wave[0], wave[1]);
+							fflush(foutputwave);
+
 							//fflush(foutputnk);
 							//double flux[3];
 							//get_flux(spin, Lz, Q, flux);
@@ -615,6 +636,15 @@ int main(int argc, char *argv[])
 							//fprintf(foutputnk, "%.10e %.10e %.10e %.10e %.10e %.10e %.10e\n",
 							//	var[0] + var[8], var[1] + var[9], var[2] + var[10], var[3] + var[11], E, Lz, Q);
 							fflush(foutput);
+							getwave(M, R_pc, massratio, THETA, PHI, var[1] + var[9], var[2] + var[10], var[3] + var[11], var[4] + var[12], var[5] + var[13], var[6] + var[14], var[7] + var[15],
+								/*F_t*/(z1*k1[4] + z2*k2[4] + z3*k3[4] + z4*k4[4] + z5*k5[4] + z6*k6[4]) / h,
+								/*F_r*/(z1*k1[5] + z2*k2[5] + z3*k3[5] + z4*k4[5] + z5*k5[5] + z6*k6[5]) / h,
+								/*F_theta*/(z1*k1[6] + z2*k2[6] + z3*k3[6] + z4*k4[6] + z5*k5[6] + z6*k6[6]) / h,
+								/*F_phi*/(z1*k1[7] + z2*k2[7] + z3*k3[7] + z4*k4[7] + z5*k5[7] + z6*k6[7]) / h, wave);
+							fprintf(foutputwave, "%.10e %.10e %.10e\n",
+								t_sec, wave[0], wave[1]);
+							fflush(foutputwave);
+
 							//fflush(foutputnk);
 							//double flux[3];
 							//get_flux(spin, Lz, Q, flux);
@@ -1103,6 +1133,79 @@ void get_flux(double spin,double E, double L, double Q, double flux[]) {
 	flux[0] = Efluxmod;
 	flux[1] = Lfluxmod;
 	flux[2] = Qfluxmod;
+}
+
+
+void getwave(double M, double R_pc, double mu/*mass ratio*/, double THETA, double PHI, double r, double th, double phi, double ut, double ur, double uth, double uphi, double F_t, double F_r, double F_th, double F_phi, double wave[2]) {
+
+	double x = r*sin(th)*cos(phi);
+	double y = r*sin(th)*sin(phi);
+	double z = (r*cos(th));
+	double t_tau_dot = (ut);
+	double x_tau_dot = (ur*sin(th)*cos(phi) + r*cos(th)*cos(phi)*uth - r*sin(th)*sin(phi)*uphi);
+	double y_tau_dot = (ur*sin(th)*sin(phi) + r*cos(th)*sin(phi)*uth + r*sin(th)*cos(phi)*uphi);
+	double z_tau_dot = (ur*cos(th) - r*sin(th)*uth);
+	double x_t_dot = (x_tau_dot / t_tau_dot);
+	double y_t_dot = (y_tau_dot / t_tau_dot);
+	double z_t_dot = (z_tau_dot / t_tau_dot);
+
+	double vr_tau_dot = ((F_r*t_tau_dot - ur*F_t) / t_tau_dot / t_tau_dot);
+	double vth_tau_dot = ((F_th*t_tau_dot - uth*F_t) / t_tau_dot / t_tau_dot);
+	double vphi_tau_dot = ((F_phi*t_tau_dot - uphi*F_t) / t_tau_dot / t_tau_dot);
+
+	double vx_tau_dot = (vr_tau_dot*sin(th)*cos(phi) + ur / ut*cos(th)*cos(phi)*uth - ur / ut*sin(th)*sin(phi)*uphi
+		+ ur*cos(th)*cos(phi)*uth / ut - r*sin(th)*cos(phi)*uth / ut*uth - r*cos(th)*sin(phi)*uth / ut*uphi + r*cos(th)*cos(phi)*vth_tau_dot
+		- ur*sin(th)*sin(phi)*uphi / ut - r*cos(th)*sin(phi)*uphi / ut*uth - r*sin(th)*cos(phi)*uphi / ut*uphi - r*sin(th)*sin(phi)*vphi_tau_dot);
+
+	double vy_tau_dot = (vr_tau_dot*sin(th)*sin(phi) + ur / ut*cos(th)*sin(phi)*uth + ur / ut*sin(th)*cos(phi)*uphi
+		+ ur*cos(th)*sin(phi)*uth / ut - r*sin(th)*sin(phi)*uth / ut*uth + r*cos(th)*cos(phi)*uth / ut*uphi + r*cos(th)*sin(phi)*vth_tau_dot
+		+ ur*sin(th)*cos(phi)*uphi / ut + r*cos(th)*cos(phi)*uphi / ut*uth - r*sin(th)*sin(phi)*uphi / ut*uphi + r*sin(th)*cos(phi)*vphi_tau_dot);
+
+	double vz_tau_dot = (vr_tau_dot*cos(th) - ur / ut*sin(th)*uth
+		- ur*sin(th)*uth / ut - r*cos(th)*uth / ut*uth - r*sin(th)*vth_tau_dot);
+
+	double x_t_2dot = (vx_tau_dot / ut);
+	double y_t_2dot = (vy_tau_dot / ut);
+	double z_t_2dot = (vz_tau_dot / ut);
+
+	//四极矩算法，在trace - reversed gauge的metric
+
+
+	double hbar_xx = (4 * (x_t_dot*x_t_dot + x*x_t_2dot));
+	double hbar_yy = (4 * (y_t_dot*y_t_dot + y*y_t_2dot));
+	double hbar_zz = (4 * (z_t_dot*z_t_dot + z*z_t_2dot));
+	double hbar_xy = (2 * (y*x_t_2dot + y_t_2dot*x + 2 * y_t_dot*x_t_dot));
+	double hbar_yz = (2 * (y*z_t_2dot + y_t_2dot*z + 2 * y_t_dot*z_t_dot));
+	double hbar_xz = (2 * (z*x_t_2dot + z_t_2dot*x + 2 * z_t_dot*x_t_dot));
+
+	//由trace - reversed gauge转换到transverse traceless gauge
+
+
+
+	double hTT_TT = (cos(THETA)*cos(THETA)* (hbar_xx*cos(PHI)*cos(PHI) + hbar_xy*sin(2 * PHI) + hbar_yy*sin(PHI)*sin(PHI)) + hbar_zz*sin(THETA)*sin(THETA) - sin(2 * THETA)* (hbar_xz*cos(PHI) + hbar_yz*sin(PHI)));
+	double hTT_TP = (cos(THETA)* (-0.5*hbar_xx*sin(2 * PHI) + hbar_xy*cos(2 * PHI) + 0.5*hbar_yy*sin(2 * PHI)) + sin(THETA)* (hbar_xz*sin(PHI) - hbar_yz*cos(PHI)));
+	double hTT_PP = (hbar_xx*sin(PHI)*sin(PHI) - hbar_xy*sin(2 * PHI) + hbar_yy*cos(PHI)*cos(PHI));
+	double hTT_plus = (0.5*(hTT_TT - hTT_PP));
+	double hTT_cross = (hTT_TP);
+
+
+	//转换单位
+	double Grav = 6.674e-11; //引力常数
+	double clight = 2.998e8;//光速
+	double Msol = 1.989e30;  //太阳质量，以千克做单位
+
+
+							 //把pc距离转换成M为单位
+	double R = R_pc*3.0857e16*clight*clight / Grav / M / Msol;  //以中心天体质量为单位的，长度米与中心天体质量的换算是 1m / kg = clight*clight / G
+
+																//小天体的质量:mu
+																//mu = 1e-5 #应该是以中心天体质量为单位的
+
+	double hTT_plus_true = hTT_plus*mu / R;
+	double hTT_cross_true = hTT_cross*mu / R;
+	wave[0] = hTT_plus_true;
+	wave[1] = hTT_cross_true;
+
 }
 
 void dcardboy(double spin, double boy[], double car[], double dcar_dboy[][4]) {//从Boyer-Lindquist坐标换到Cartesian坐标

@@ -106,9 +106,9 @@ elif control.metric.lower() == 'custom':
 
     except:
         print('Please check custom metric files you prepared')
-os.system('echo ./trace %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e\n'%(M,spin,E,Lz,Q,p/(1-e),tottime,d1,d2,d3,mass_ratio,e,p,iota))
+os.system('echo ./trace %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e\n'%(M,spin,E,Lz,Q,p/(1-e),tottime,d1,d2,d3,mass_ratio,e,p,iota,R_pc,THETA,PHI))
 
-os.system('./trace %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e\n'%(M,spin,E,Lz,Q,p/(1-e),tottime,d1,d2,d3,mass_ratio,e,p,iota))
+os.system('./trace %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e %.10e\n'%(M,spin,E,Lz,Q,p/(1-e),tottime,d1,d2,d3,mass_ratio,e,p,iota,R_pc,THETA,PHI))
 os.system('rm trace')
 if control.metric.lower() == 'custom':
     os.system('rm main.cpp')
@@ -120,16 +120,16 @@ print('Orbit saved in '+curdir+'/ORBCAR')
 outcarfile.write('Orbit Calculation done. Orbits saved in ORBCAR\n')
 outcarfile.write('------------------------------------------\n')
 
-print('Computing waveform')
+#print('Computing waveform')
 #waveform calculation
-outcarfile.write('\n\n')
-outcarfile.write('------------------------------------------\n')
-outcarfile.write('Waveform calculation start...\n')
-myt_sec,mywave=getwave('ORBCAR',THETA=THETA,PHI=PHI,M=M,mu=mass_ratio,R_pc=R_pc) #format: time(s) , h_plus + i * h_cross
-for ind in range(len(myt_sec)):
-    wavecarfile.write('%.10e \t%.10e \t%.10e \n'%(myt_sec[ind],np.real(mywave[ind]),np.imag(mywave[ind])))
+#outcarfile.write('\n\n')
+#outcarfile.write('------------------------------------------\n')
+#outcarfile.write('Waveform calculation start...\n')
+#myt_sec,mywave=getwave('ORBCAR',THETA=THETA,PHI=PHI,M=M,mu=mass_ratio,R_pc=R_pc) #format: time(s) , h_plus + i * h_cross
+#for ind in range(len(myt_sec)):
+#    wavecarfile.write('%.10e \t%.10e \t%.10e \n'%(myt_sec[ind],np.real(mywave[ind]),np.imag(mywave[ind])))
 
 outcarfile.write('Waveform calculation done. Waveform saved in WAVECAR\n')
 outcarfile.write('------------------------------------------\n')
-print('Done')
+#print('Done')
 print('Waveform saved in '+curdir+'/WAVECAR') 
