@@ -1,22 +1,19 @@
-XSPEG v0.2.0 
+XSPEG v0.3.0-limited
 
 This software will be  used to compute gravitational waveforms from Extreme-Mass-Ratio Inspirals (EMRIs) in general stationary, time independent spacetime.
 "KRZ" metric is inplemented in current version. For KRZ metric, see reference [1] and [2].
 2PN approximation with some corrections is adopted when evaluating radiative force, see reference [3] and manual.pdf.
 The usage of this software will be very similar to VASP, a software widely used in solid state physics computation.
 
-INSTALL:
-run the script "install_xspeg.sh" to install this software:
-./install_xspeg.sh
+RUN:
+run the script "start.py" to start this software:
+sh start.sh
 
 USE:
-1. prepare the INCAR file where you specify the parameters in the format explained in manual.pdf (see sample_input/INCAR for an example).
-*If the metric is custom, also prepare the .cpp file where you describe the metric, in the format explained in manual.pdf (see sample_input/metric.cpp for an example).
+1. prepare the INCAR file where you specify the parameters in the format explained in manual.pdf.
+*Custom metric are not supported in this edtion (only built-in metrics are available,  i.e. KRZ metric and Kerr metric)
 
-2. run the software by the command:
-xspeg
-
-3. Three files will be generated in your current directory:
+2. Three files will be generated in your current directory:
 OUTCAR: explaining the parameters and the computing process
 ORBCAR: the orbit of the test particle, in the format explained in manual.pdf (see sample_output/ORBCAR for an example).
 WAVECAR: the gravitational waveform, in the format explained in manual.pdf (see sample_output/WAVECAR for an example).

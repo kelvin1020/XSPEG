@@ -10,7 +10,7 @@ SPIN            0.9
 ECC             0.0
 P               10
 IOTA            numpy.pi/4
-METRIC          'custom'
+METRIC          'kerr'
 DEFPAR_VAL       [0.1,0,0]
 
 #time should be in unit of second
