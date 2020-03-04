@@ -1,0 +1,7 @@
+name: xspeg
+channels:
+  - conda-forge
+dependencies:
+  - python=3
+  - numpy
+  - scipy 
