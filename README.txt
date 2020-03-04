@@ -1,4 +1,5 @@
 XSPEG v0.3.0-limited
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/kelvin1020/XSPEG/master)
 
 This software will be  used to compute gravitational waveforms from Extreme-Mass-Ratio Inspirals (EMRIs) in general stationary, time independent spacetime.
 "KRZ" metric is inplemented in current version. For KRZ metric, see reference [1] and [2].
@@ -20,6 +21,6 @@ WAVECAR: the gravitational waveform, in the format explained in manual.pdf (see 
 
 [1] Roman Konoplya, Luciano Rezzolla, and Alexander Zhidenko. General parametrization of axisymmetric black holes in metric theories of gravity. Phys. Rev. D, 93:064015, Mar 2016.
 [2] Yueying Ni, Jiachen Jiang, and Cosimo Bambi. Testing the kerr metric with the iron line and the krz parametrization. Journal of Cosmology and Astroparticle Physics, 2016(09):014, 2016.
-[3] Stanislav Babak, Hua Fang, Jonathan R. Gair, Kostas Glampedakis, and Scott A. Hughes. ¡°kludge¡± gravitational waveforms for a test-body orbiting a kerr black hole. Phys. Rev. D, 75:024005, Jan 2007.
+[3] Stanislav Babak, Hua Fang, Jonathan R. Gair, Kostas Glampedakis, and Scott A. Hughes. Â¡Â°kludgeÂ¡Â± gravitational waveforms for a test-body orbiting a kerr black hole. Phys. Rev. D, 75:024005, Jan 2007.
 
 Author: Xin Shuo, shuoxintj@gmail.com
