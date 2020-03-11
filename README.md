@@ -8,7 +8,8 @@ The usage of this software will be very similar to VASP, a software widely used 
 
 RUN:
 run the script "start.py" to start this software:
-sh start.sh
+
+python start.py
 
 USE:
 1. prepare the INCAR file where you specify the parameters in the format explained in manual.pdf.
